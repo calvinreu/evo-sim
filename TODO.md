@@ -3,13 +3,14 @@
 ## TODO
 
 Brain for Creature and evaluation of neural network output
-map generator should return map without creatures and without food: config Config
 refresh function should change the map and creatures according to the rules of the simulation: map* Map, config Config
 save function + load funcion map Map, config Config
 User Interface: map* Map
 reproduce: creature Creature return Creature
 
 ## In Progress
+
+map generator should return map without creatures and without food: config Config
 
 ## Done
 
