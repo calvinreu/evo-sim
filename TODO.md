@@ -7,10 +7,9 @@ refresh function should change the map and creatures according to the rules of t
 save function + load funcion map Map, config Config
 User Interface: map* Map
 reproduce: creature Creature return Creature
+map generator should return map without creatures and without food: config Config
 
 ## In Progress
-
-map generator should return map without creatures and without food: config Config
 
 ## Done
 
