@@ -87,6 +87,8 @@ func (graphic Graphic) RunOutput(running *bool) {
 	var timeStamp, frameTime uint32
 	frameTime = (1000 / graphic.fps) - 1
 
+	fmt.Println("Graphics system running")
+
 	for *running {
 		timeStamp = sdl.GetTicks()
 		graphic.Render()
@@ -94,6 +96,8 @@ func (graphic Graphic) RunOutput(running *bool) {
 			sdl.Delay(frameTime - (sdl.GetTicks() - timeStamp))
 		}
 	}
+
+	fmt.Println("Graphics system terminated")
 }
 
 //Render renders the information from the graphic object to the screen
@@ -117,7 +121,7 @@ func (graphic *Graphic) Render() {
 }
 
 //New returns a Graphic object with initialized renderer and window note that Sprites have to be added manual
-func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags, RendererFlags uint32) error {
+func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags, RendererFlags, FPS uint32) error {
 	var err = sdl.Init(sdl.INIT_VIDEO | sdl.INIT_TIMER)
 	if err != nil {
 		return err
@@ -139,6 +143,7 @@ func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags,
 	graphic.screenRect.X = 0
 	graphic.screenRect.Y = 0
 	graphic.screenRect.W, graphic.screenRect.H = graphic.window.GetMaximumSize()
+	graphic.fps = FPS
 
 	return nil
 }
