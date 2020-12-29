@@ -7,6 +7,7 @@ import (
 	"../environment"
 )
 
+//Configure graphic for use with info from config file
 func (graphic *Graphic) Configure(config *config.Config, chart *environment.Map) {
 
 	err := graphic.New(config.WinConfig.Title, config.WinConfig.X, config.WinConfig.Y, config.WinConfig.Width, config.WinConfig.Height, config.WinConfig.WindowFlags, config.WinConfig.RendererFlags)
