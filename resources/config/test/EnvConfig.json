@@ -4,9 +4,9 @@
     "MinWaterRequirement" : 1.3,
     "FoodGrowthSpeedPerWaterPercent" : 1.4,
     "WaterPerFood" : 1.5,
+    "ReproductionCost" : 1.6,
     "MapHeight" : 1,
     "MapWidth" : 2,
     "Seed" : 3,
-    "ContinentCount" : 4,
-    "ReproductionCost" : 5
+    "ContinentCount" : 4
 }
