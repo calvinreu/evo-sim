@@ -15,6 +15,8 @@ func main() {
 	var config config.Config
 	var chart environment.Map
 	var window graphic.Graphic
+	var command string
+	var rendererRunning bool = true
 
 	args := os.Args[1:]
 	if len(args) > 2 {
@@ -28,9 +30,21 @@ func main() {
 
 	window.Configure(&config, &chart)
 
-	var endProgramm string
+	go window.RunOutput(&rendererRunning)
 
-	fmt.Scanln(&endProgramm)
+	for true {
+		fmt.Scanln(&command)
+
+		if command == "kill_renderer" {
+			rendererRunning = false
+		}
+
+		if command == "exit" {
+			break
+		}
+	}
+
+	rendererRunning = false
 
 	sdl.Quit()
 
