@@ -11,12 +11,13 @@ import (
 
 //Graphic contains the information required to render a window with diffrent Sprites
 type Graphic struct {
-	fps             uint32
-	PositionOnChart *sdl.Point //top left corner of the map part visible
-	sprites         []Sprite
-	chartTexture    *sdl.Texture
-	renderer        *sdl.Renderer
-	window          *sdl.Window
+	fps          uint32
+	chartSRect   sdl.Rect
+	screenRect   sdl.Rect
+	sprites      []Sprite
+	chartTexture *sdl.Texture
+	renderer     *sdl.Renderer
+	window       *sdl.Window
 }
 
 //AddMap adds the map for rendering to the graphic
@@ -45,7 +46,11 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 	graphic.AddSpriteByID(spriteID, tileConfig.SrcRects[1])
 	graphic.AddSpriteByID(spriteID, tileConfig.SrcRects[0])
 
-	graphic.renderer.SetRenderTarget(graphic.chartTexture)
+	err = graphic.renderer.SetRenderTarget(graphic.chartTexture)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	var dRect sdl.Rect
 
@@ -66,12 +71,21 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 			}
 		}
 	}
+
+	graphic.sprites = nil
+
+	err = graphic.renderer.SetRenderTarget(nil)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 //RunOutput will render FPS frames every second until running is false
 func (graphic Graphic) RunOutput(running *bool) {
 	var timeStamp, frameTime uint32
-	frameTime = 1000 / graphic.fps
+	frameTime = (1000 / graphic.fps) - 1
 
 	for *running {
 		timeStamp = sdl.GetTicks()
@@ -87,6 +101,8 @@ func (graphic *Graphic) Render() {
 
 	graphic.renderer.SetDrawColor(0, 0, 0, 1)
 	graphic.renderer.Clear()
+
+	graphic.renderer.Copy(graphic.chartTexture, &graphic.chartSRect, &graphic.screenRect)
 
 	for _, i := range graphic.sprites {
 		for j := i.instances.Front(); j != nil; j = j.Next() {
@@ -119,6 +135,10 @@ func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags,
 		sdl.QuitSubSystem(sdl.INIT_VIDEO)
 		return err
 	}
+
+	graphic.screenRect.X = 0
+	graphic.screenRect.Y = 0
+	graphic.screenRect.W, graphic.screenRect.H = graphic.window.GetMaximumSize()
 
 	return nil
 }
