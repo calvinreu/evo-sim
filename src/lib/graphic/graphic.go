@@ -12,7 +12,7 @@ import (
 //Graphic contains the information required to render a window with diffrent Sprites
 type Graphic struct {
 	fps             uint32
-	PositionOnChart *sdl.Point
+	PositionOnChart *sdl.Point //top left corner of the map part visible
 	sprites         []Sprite
 	chartTexture    *sdl.Texture
 	renderer        *sdl.Renderer
@@ -22,6 +22,12 @@ type Graphic struct {
 //AddMap adds the map for rendering to the graphic
 func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environment.Map) {
 	var err error
+
+	if len(chart.Fields) == 0 {
+		fmt.Println("map not initialized before function call: graphic.AddMap")
+		return
+	}
+
 	graphic.chartTexture, err = graphic.renderer.CreateTexture(sdl.PIXELFORMAT_RGB888, sdl.TEXTUREACCESS_TARGET, (int32)(len(chart.Fields))*(tileConfig.SrcRects[0].W), (int32)(len(chart.Fields[0]))*tileConfig.SrcRects[0].H)
 	if err != nil {
 		fmt.Println(err)
