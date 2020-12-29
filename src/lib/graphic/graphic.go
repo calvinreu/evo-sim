@@ -4,20 +4,68 @@ package graphic
 import (
 	"fmt"
 
+	"../config"
+	"../environment"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
 //Graphic contains the information required to render a window with diffrent Sprites
 type Graphic struct {
-	Sprites  []Sprite
-	Renderer *sdl.Renderer
-	window   *sdl.Window
+	fps             uint32
+	PositionOnChart *sdl.Point
+	sprites         []Sprite
+	chartTexture    *sdl.Texture
+	renderer        *sdl.Renderer
+	window          *sdl.Window
+}
+
+//AddMap adds the map for rendering to the graphic
+func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environment.Map) {
+	var err error
+	graphic.chartTexture, err = graphic.renderer.CreateTexture(sdl.PIXELFORMAT_RGB888, sdl.TEXTUREACCESS_TARGET, (int32)(len(chart.Fields))*(tileConfig.SrcRects[0].W), (int32)(len(chart.Fields[0]))*tileConfig.SrcRects[0].H)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	//spriteID 0 = desert 1 = land 2 = water
+
+	spriteID := graphic.AddSprite(tileConfig.ImgPath, tileConfig.SrcRects[2])
+
+	if spriteID != 0 {
+		fmt.Println("tile sprite has to be the first sprite but it is sprite nr: ", spriteID)
+	}
+
+	graphic.AddSpriteByID(spriteID, tileConfig.SrcRects[1])
+	graphic.AddSpriteByID(spriteID, tileConfig.SrcRects[0])
+
+	graphic.renderer.SetRenderTarget(graphic.chartTexture)
+
+	var dRect sdl.Rect
+
+	for x := 0; x < len(chart.Fields); x++ {
+		for y := 0; y < len(chart.Fields[0]); y++ {
+
+			dRect.X = int32(x) * tileConfig.SrcRects[0].W
+			dRect.Y = int32(y) * tileConfig.SrcRects[0].H
+			dRect.W = tileConfig.SrcRects[0].W
+			dRect.H = tileConfig.SrcRects[0].H
+
+			if chart.Fields[x][y].WaterPercentage < 10 {
+				graphic.renderer.Copy(graphic.sprites[0].texture, &graphic.sprites[0].srcRect, &dRect)
+			} else if chart.Fields[x][y].WaterPercentage < 55 {
+				graphic.renderer.Copy(graphic.sprites[0].texture, &graphic.sprites[1].srcRect, &dRect)
+			} else {
+				graphic.renderer.Copy(graphic.sprites[0].texture, &graphic.sprites[2].srcRect, &dRect)
+			}
+		}
+	}
 }
 
 //RunOutput will render FPS frames every second until running is false
-func (graphic Graphic) RunOutput(FPS uint32, running *bool) {
+func (graphic Graphic) RunOutput(running *bool) {
 	var timeStamp, frameTime uint32
-	frameTime = 1000 / FPS
+	frameTime = 1000 / graphic.fps
 
 	for *running {
 		timeStamp = sdl.GetTicks()
@@ -29,59 +77,58 @@ func (graphic Graphic) RunOutput(FPS uint32, running *bool) {
 }
 
 //Render renders the information from the graphic object to the screen
-func (graphic Graphic) Render() {
+func (graphic *Graphic) Render() {
 
-	graphic.Renderer.SetDrawColor(255, 255, 255, 1)
-	graphic.Renderer.Clear()
+	graphic.renderer.SetDrawColor(0, 0, 0, 1)
+	graphic.renderer.Clear()
 
-	for _, i := range graphic.Sprites {
+	for _, i := range graphic.sprites {
 		for j := i.instances.Front(); j != nil; j = j.Next() {
 			if instance, ok := j.Value.(*Instance); ok {
-				graphic.Renderer.CopyExF(i.texture, &i.srcRect, &instance.DestRect, instance.Angle, &instance.Center, sdl.FLIP_HORIZONTAL)
+				graphic.renderer.CopyExF(i.texture, &i.srcRect, &instance.DestRect, instance.Angle, &instance.Center, sdl.FLIP_HORIZONTAL)
 			} else {
 				fmt.Println("list of sprite does not contain Instances")
 			}
 		}
 	}
-	graphic.Renderer.Present()
+	graphic.renderer.Present()
 }
 
 //New returns a Graphic object with initialized renderer and window note that Sprites have to be added manual
-func New(title string, x, y, width, heigh int32, WindowFlags, RendererFlags uint32) (Graphic, error) {
-	var graphic Graphic
+func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags, RendererFlags uint32) error {
 	var err = sdl.Init(sdl.INIT_VIDEO | sdl.INIT_TIMER)
 	if err != nil {
-		return graphic, err
+		return err
 	}
 
 	graphic.window, err = sdl.CreateWindow(title, x, y, width, heigh, WindowFlags)
 	if err != nil {
 		sdl.QuitSubSystem(sdl.INIT_VIDEO | sdl.INIT_TIMER)
-		return graphic, err
+		return err
 	}
 
-	graphic.Renderer, err = sdl.CreateRenderer(graphic.window, -1, RendererFlags)
+	graphic.renderer, err = sdl.CreateRenderer(graphic.window, -1, RendererFlags)
 
 	if err != nil {
 		sdl.QuitSubSystem(sdl.INIT_VIDEO)
-		return graphic, err
+		return err
 	}
 
-	return graphic, nil
+	return nil
 }
 
 //AddSprite adds another sprite which can be used be creating a instance of it see Sprite.NewInstance
 func (graphic *Graphic) AddSprite(imgPath string, srcRect sdl.Rect) uint32 {
 	var err error
 	var sprite Sprite
-	retIndex := len(graphic.Sprites)
+	retIndex := len(graphic.sprites)
 
-	sprite, err = NewSprite(graphic.Renderer, imgPath, srcRect)
+	sprite, err = NewSprite(graphic.renderer, imgPath, srcRect)
 	if err != nil {
 		fmt.Println(err)
 		return 0
 	}
-	graphic.Sprites = append(graphic.Sprites, sprite)
+	graphic.sprites = append(graphic.sprites, sprite)
 
 	return uint32(retIndex)
 }
@@ -90,13 +137,13 @@ func (graphic *Graphic) AddSprite(imgPath string, srcRect sdl.Rect) uint32 {
 func (graphic *Graphic) AddSpriteByID(spriteID uint32, srcRect sdl.Rect) uint32 {
 	var sprite Sprite
 
-	if len(graphic.Sprites)-1 < (int)(spriteID) {
+	if len(graphic.sprites)-1 < (int)(spriteID) {
 		fmt.Println("sprite: ", spriteID, " does not exist")
 	}
 
-	sprite.texture = graphic.Sprites[spriteID].texture
+	sprite.texture = graphic.sprites[spriteID].texture
 	sprite.srcRect = srcRect
 
-	retIndex := len(graphic.Sprites)
+	retIndex := len(graphic.sprites)
 	return uint32(retIndex)
 }
