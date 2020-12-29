@@ -1,0 +1,10 @@
+{
+    "ImgPath" : "../../resources/img/creature.png",
+    "SrcRects" : [ 
+        { "X" : 0,
+          "Y" : 0,
+          "W" : 50,
+          "H" : 50
+        }
+    ]
+}

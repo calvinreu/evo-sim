@@ -1,0 +1,5 @@
+{
+    "EnvironmentConfigFile" : "../../resources/config/test/EnvConfig.json",
+    "WindowConfigFile" : "../../resources/config/test/WindowConfig.json",
+    "ImageConfigFiles" : ["../../resources/config/test/img/tile.json", "../../resources/config/test/img/creature.json"]
+}
