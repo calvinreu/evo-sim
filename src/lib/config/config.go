@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -17,16 +17,15 @@ type Config struct {
 
 //EnvironmentConfig contains info about map and creature
 type EnvironmentConfig struct {
-	EnergyLossMultiplier, AverageWaterPercentage, MinWaterRequirement, FoodGrowthSpeedPerWaterPercent, WaterPerFood float64
-	MapHeight, MapWidth, Seed, ContinentCount                                                                       uint16
-	ReproductionCost                                                                                                float64
+	EnergyLossMultiplier, AverageWaterPercentage, MinWaterRequirement, FoodGrowthSpeedPerWaterPercent, WaterPerFood, ReproductionCost float64
+	MapHeight, MapWidth, Seed, ContinentCount                                                                                         uint16
 }
 
 //WindowConfig Render info for Window
 type WindowConfig struct {
-	Title                      string
-	X, Y, Width, Height        int32
-	WindowFlags, RendererFlags uint32
+	Title                           string
+	X, Y, Width, Height             int32
+	WindowFlags, RendererFlags, FPS uint32
 }
 
 //ImageConfig contains info about one img
@@ -80,11 +79,11 @@ func (config *Config) Load(filePath string) {
 	fmt.Println("MinWaterRequirement", config.EnvConfig.MinWaterRequirement)
 	fmt.Println("FoodGrowthSpeedPerWaterPercent", config.EnvConfig.FoodGrowthSpeedPerWaterPercent)
 	fmt.Println("WaterPerFood", config.EnvConfig.WaterPerFood)
+	fmt.Println("ReproductionCost", config.EnvConfig.ReproductionCost)
 	fmt.Println("MapHeight", config.EnvConfig.MapHeight)
 	fmt.Println("MapWidth", config.EnvConfig.MapWidth)
 	fmt.Println("Seed", config.EnvConfig.Seed)
 	fmt.Println("ContinentCount", config.EnvConfig.ContinentCount)
-	fmt.Println("ReproductionCost", config.EnvConfig.ReproductionCost)
 	fmt.Println("----------")
 
 	//load Window Config file
@@ -105,16 +104,17 @@ func (config *Config) Load(filePath string) {
 	fmt.Println("Height: ", config.WinConfig.Height)
 	fmt.Println("WindowFlags: ", config.WinConfig.WindowFlags)
 	fmt.Println("RendererFlags: ", config.WinConfig.RendererFlags)
+	fmt.Println("FPS: ", config.WinConfig.FPS)
 	fmt.Println("----------")
 
 	//load Image Config Files
-	var tempImgConfig ImageConfig
-
 	for _, i := range tempConfig.ImageConfigFiles {
 		dataImage, err := ioutil.ReadFile(i)
 		if err != nil {
 			fmt.Print(err)
 		}
+
+		var tempImgConfig ImageConfig
 
 		err = json.Unmarshal(dataImage, &tempImgConfig)
 		if err != nil {

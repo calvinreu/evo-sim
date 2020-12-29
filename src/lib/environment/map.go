@@ -1,4 +1,4 @@
-package main
+package environment
 
 //Field contains the information of one square of the map
 type Field struct {
