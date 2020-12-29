@@ -25,22 +25,22 @@ func NewCreature(attributes Attributes, brain Brain) Creature {
 }
 
 //Has the creature enough energy to reproduce?
-func (c *Creature) CanReproduce(config *Config) bool {
+func (c *Creature) CanReproduce(config *EnvironmentConfig) bool {
 	return c.EnergyLevel >= config.ReproductionCost
 }
 
 //Is the creature able to produce more energy?
-func (c *Creature) CanProduceEnergy(config *Config) bool {
+func (c *Creature) CanProduceEnergy(config *EnvironmentConfig) bool {
 	return c.FoodLevel >= 1 && c.WaterLevel >= config.WaterPerFood
 }
 
 //When the creature has no energy left, it dies
-func (c *Creature) IsDead(config *Config) bool {
+func (c *Creature) IsDead(config *EnvironmentConfig) bool {
 	return c.EnergyLevel <= 0 && !c.CanProduceEnergy(config)
 }
 
 //The creature tries to produce as much energy as possible. Returns how much energy the creature produced
-func (c *Creature) ProduceEnergy(config *Config) float64 {
+func (c *Creature) ProduceEnergy(config *EnvironmentConfig) float64 {
 	var producedEnergy float64 = math.Min(c.FoodLevel, math.Floor(c.WaterLevel/config.WaterPerFood))
 	c.EnergyLevel += producedEnergy
 	c.FoodLevel -= producedEnergy
