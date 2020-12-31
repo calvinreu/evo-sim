@@ -1,13 +1,12 @@
 # Protocol to save
 
-
 ## Main JSON
 
 the main json file contains the relative file paths to evosim of the other required config files it should look like this:
 
     {
-        "config file" : "path to main config file",
-        "map file" : "path to map file",
+        "configFile" : "path to main config file",
+        "mapFile" : "path to map file",
         "creatures" : ["creature file CreatureNr", ...]
     }
 
@@ -32,5 +31,5 @@ the map file should contain all the atributes of the current map it should look 
         "Food" : foodValue,
         "Water" : water value of the creature,
         "Speed" : speed at WaterPercentage 0,
-        "Water Slowdown" : value of slowdown
+        "WaterSlowdown" : value of slowdown
     }
