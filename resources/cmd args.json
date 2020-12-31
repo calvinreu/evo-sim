@@ -1,0 +1,3 @@
+{
+    "commands" : ["--help for help", "--new + <config file name.json> to create new simulation:", "--load + <save file name.json> to load a simultion"]
+}
