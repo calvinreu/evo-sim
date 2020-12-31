@@ -103,7 +103,7 @@ func (graphic Graphic) RunOutput(running *bool) {
 //Render renders the information from the graphic object to the screen
 func (graphic *Graphic) Render() {
 
-	graphic.renderer.SetDrawColor(0, 0, 0, 1)
+	graphic.renderer.SetDrawColor(10, 10, 10, 1)
 	graphic.renderer.Clear()
 
 	graphic.renderer.Copy(graphic.chartTexture, &graphic.chartSRect, &graphic.screenRect)
@@ -145,6 +145,8 @@ func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags,
 	graphic.screenRect.W, graphic.screenRect.H = graphic.window.GetMaximumSize()
 	graphic.fps = FPS
 
+	graphic.chartSRect.W, graphic.chartSRect.H = graphic.window.GetMaximumSize()
+
 	return nil
 }
 
@@ -176,5 +178,8 @@ func (graphic *Graphic) AddSpriteByID(spriteID uint32, srcRect sdl.Rect) uint32 
 	sprite.srcRect = srcRect
 
 	retIndex := len(graphic.sprites)
+
+	graphic.sprites = append(graphic.sprites, sprite)
+
 	return uint32(retIndex)
 }
