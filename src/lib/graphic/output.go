@@ -32,7 +32,3 @@ func (graphic *Graphic) Configure(config *config.Config, chart *environment.Map)
 		}
 	}
 }
-
-func runOutput(chart *environment.Map, window *Graphic, running *bool) {
-
-}
