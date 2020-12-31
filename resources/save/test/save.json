@@ -1,0 +1,5 @@
+{
+    "configFile" : "../../resources/config/test/config.json",
+    "mapFile" : "../../resources/save/test/map.json",
+    "creatures" : ["../../resources/save/test/creature0.json", "../../resources/save/test/creature1.json", "../../resources/save/test/creature2.json"]
+}

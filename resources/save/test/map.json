@@ -1,0 +1,20 @@
+{
+    "Fields" : [[ {
+            "Food" : 1,
+            "WaterPercentage" : 7,
+            "Creatures" : []
+        },{
+            "Food" : 10,
+            "WaterPercentage" : 100,
+            "Creatures" : []
+        }],[ {
+            "Food" : 20,
+            "WaterPercentage" : 50,
+            "Creatures" : []
+        },{
+            "Food" : 40,
+            "WaterPercentage" : 100,
+            "Creatures" : []
+        }
+    ]]
+}
