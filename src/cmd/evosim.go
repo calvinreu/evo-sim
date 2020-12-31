@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/list"
 	"fmt"
 	"os"
 
@@ -17,6 +18,7 @@ func main() {
 	var window graphic.Graphic
 	var command string
 	var rendererRunning bool = true
+	var creatures *list.List
 
 	args := os.Args[1:]
 	if len(args) > 2 {

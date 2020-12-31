@@ -10,3 +10,8 @@ type Field struct {
 type Map struct {
 	Fields [][]Field //[x][y]
 }
+
+//Load a map from file
+func (m *Map) Load(filename string) {
+
+}

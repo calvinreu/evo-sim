@@ -57,3 +57,8 @@ func (c *Creature) ProduceEnergy(config *config.EnvironmentConfig) float64 {
 func (c *Creature) GetAttributes() Attributes {
 	return c.attributes
 }
+
+//Load creature from file
+func (c *Creature) Load(filename string) {
+
+}
