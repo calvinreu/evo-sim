@@ -53,7 +53,7 @@ type Graphic struct {
 	running      *atomic.Value
 	fps          uint32
 	chartSRect   sdl.Rect
-	screenRect   sdl.Rect
+	chartDRect   sdl.Rect
 	sprites      []Sprite
 	chartTexture *sdl.Texture
 	renderer     *sdl.Renderer
@@ -69,7 +69,9 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 		return
 	}
 
-	graphic.chartTexture, err = graphic.renderer.CreateTexture(sdl.PIXELFORMAT_RGB888, sdl.TEXTUREACCESS_TARGET, (int32)(len(chart.Fields))*(tileConfig.SrcRects[0].W), (int32)(len(chart.Fields[0]))*tileConfig.SrcRects[0].H)
+	MapWidth, MapHeight := (int32)(len(chart.Fields))*(tileConfig.SrcRects[0].W), (int32)(len(chart.Fields[0]))*(tileConfig.SrcRects[0].H)
+
+	graphic.chartTexture, err = graphic.renderer.CreateTexture(sdl.PIXELFORMAT_RGB888, sdl.TEXTUREACCESS_TARGET, MapWidth, MapHeight)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -120,6 +122,22 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 		fmt.Println(err)
 		return
 	}
+
+	windowWidth, windowHeight := graphic.window.GetSize()
+
+	if windowHeight > MapHeight {
+		graphic.chartDRect.H, graphic.chartSRect.H = MapHeight, MapHeight
+		graphic.chartDRect.Y = (windowHeight - MapHeight) / 2
+	} else {
+		graphic.chartDRect.H, graphic.chartSRect.H = windowHeight, windowHeight
+	}
+
+	if windowWidth > MapWidth {
+		graphic.chartDRect.W, graphic.chartSRect.W = MapWidth, MapWidth
+		graphic.chartDRect.X = (windowWidth - MapWidth) / 2
+	} else {
+		graphic.chartDRect.W, graphic.chartSRect.W = windowWidth, windowWidth
+	}
 }
 
 //
@@ -152,7 +170,7 @@ func (graphic *Graphic) Render() {
 	graphic.renderer.SetDrawColor(10, 10, 10, 1)
 	graphic.renderer.Clear()
 
-	graphic.renderer.Copy(graphic.chartTexture, &graphic.chartSRect, &graphic.screenRect)
+	graphic.renderer.Copy(graphic.chartTexture, &graphic.chartSRect, &graphic.chartDRect)
 
 	for _, i := range graphic.sprites {
 		for j := i.instances.Front(); j != nil; j = j.Next() {
@@ -186,15 +204,7 @@ func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags,
 		return err
 	}
 
-	graphic.screenRect.X = 0
-	graphic.screenRect.Y = 0
-	graphic.screenRect.W, graphic.screenRect.H = graphic.window.GetSize()
 	graphic.fps = FPS
-
-	graphic.chartSRect.X, graphic.chartSRect.Y = 0, 0
-	graphic.chartSRect.W, graphic.chartSRect.H = graphic.window.GetSize()
-
-	fmt.Println("screen size", graphic.screenRect.W, "x", graphic.screenRect.H)
 
 	return nil
 }
