@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"sync/atomic"
-	"time"
 
 	"../lib/config"
 	"../lib/environment"
@@ -24,6 +23,8 @@ func main() {
 	creatures := list.New()
 	rendererRunning := true
 	var renderSync atomic.Value
+
+	renderChannel := make(chan bool)
 
 	renderSync.Store(rendererRunning)
 
@@ -56,12 +57,12 @@ func main() {
 	window.Configure(&config, &chart)
 	window.SetRunningBool(&renderSync)
 
-	go window.RunOutput()
+	go window.RunOutput(renderChannel)
 
 	for true {
 		fmt.Scanln(&command)
 
-		if command == "kill_renderer" {
+		if command == "pause_renderer" {
 			rendererRunning = false
 			renderSync.Store(rendererRunning)
 		}
@@ -74,8 +75,7 @@ func main() {
 	rendererRunning = false
 	renderSync.Store(rendererRunning)
 
-	//time for other processes to fininsh
-	time.Sleep(500 * time.Millisecond)
+	<-renderChannel
 	sdl.Quit()
 
 }

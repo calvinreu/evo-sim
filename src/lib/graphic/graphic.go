@@ -128,7 +128,7 @@ func (graphic *Graphic) SetRunningBool(running *atomic.Value) {
 }
 
 //RunOutput will render FPS frames every second until running is false
-func (graphic Graphic) RunOutput() {
+func (graphic Graphic) RunOutput(done chan bool) {
 	var timeStamp, frameTime uint32
 	frameTime = (1000 / graphic.fps) - 1
 
@@ -142,7 +142,8 @@ func (graphic Graphic) RunOutput() {
 		}
 	}
 
-	fmt.Println("Graphics system terminated")
+	fmt.Println("Graphics system paused")
+	done <- true
 }
 
 //Render renders the information from the graphic object to the screen
