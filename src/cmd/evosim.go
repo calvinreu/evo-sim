@@ -82,7 +82,8 @@ func main() {
 
 //Commands leave me alone i don't want warnings
 type Commands struct {
-	Commands []string
+	Commands  []string
+	StartArgs []string
 }
 
 func terminalHelp() {
@@ -96,6 +97,14 @@ func terminalHelp() {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
+
+	fmt.Println("start arguments")
+
+	for _, i := range commands.StartArgs {
+		fmt.Println(i)
+	}
+
+	fmt.Println("commands")
 
 	for _, i := range commands.Commands {
 		fmt.Println(i)

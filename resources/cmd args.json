@@ -1,3 +1,4 @@
 {
-    "commands" : ["--help for help", "--new + <config file name.json> to create new simulation:", "--load + <save file name.json> to load a simultion"]
+    "Commands" : ["kill_renderer: stop rendering new frames", "exit: ends the program"],
+    "StartArgs" : ["--help for help", "--new + <config file name.json> to create new simulation:", "--load + <save file name.json> to load a simultion"]
 }
