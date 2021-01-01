@@ -187,11 +187,13 @@ func (graphic *Graphic) New(title string, x, y, width, heigh int32, WindowFlags,
 
 	graphic.screenRect.X = 0
 	graphic.screenRect.Y = 0
-	graphic.screenRect.W, graphic.screenRect.H = graphic.window.GetMaximumSize()
+	graphic.screenRect.W, graphic.screenRect.H = graphic.window.GetSize()
 	graphic.fps = FPS
 
 	graphic.chartSRect.X, graphic.chartSRect.Y = 0, 0
-	graphic.chartSRect.W, graphic.chartSRect.H = graphic.window.GetMaximumSize()
+	graphic.chartSRect.W, graphic.chartSRect.H = graphic.window.GetSize()
+
+	fmt.Println("screen size", graphic.screenRect.W, "x", graphic.screenRect.H)
 
 	return nil
 }
