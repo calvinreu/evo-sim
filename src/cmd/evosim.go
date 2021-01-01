@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync/atomic"
 
 	"../lib/config"
 	"../lib/environment"
@@ -19,8 +20,11 @@ func main() {
 	var chart environment.Map
 	var window graphic.Graphic
 	var command string
-	var rendererRunning bool = true
 	creatures := list.New()
+	rendererRunning := true
+	var renderSync atomic.Value
+
+	renderSync.Store(rendererRunning)
 
 	args := os.Args[1:]
 	if len(args) > 2 {
@@ -49,14 +53,16 @@ func main() {
 	}
 
 	window.Configure(&config, &chart)
+	window.SetRunningBool(&renderSync)
 
-	go window.RunOutput(&rendererRunning)
+	go window.RunOutput()
 
 	for true {
 		fmt.Scanln(&command)
 
 		if command == "kill_renderer" {
 			rendererRunning = false
+			renderSync.Store(rendererRunning)
 		}
 
 		if command == "exit" {
@@ -65,11 +71,15 @@ func main() {
 	}
 
 	rendererRunning = false
+	renderSync.Store(rendererRunning)
+
+	sdl.Delay(500) //time for other processes to fininsh
 
 	sdl.Quit()
 
 }
 
+//Commands leave me alone i don't want warnings
 type Commands struct {
 	Commands []string
 }
