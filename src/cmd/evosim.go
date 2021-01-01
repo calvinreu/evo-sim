@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"sync/atomic"
+	"time"
 
 	"../lib/config"
 	"../lib/environment"
@@ -73,8 +74,8 @@ func main() {
 	rendererRunning = false
 	renderSync.Store(rendererRunning)
 
-	sdl.Delay(500) //time for other processes to fininsh
-
+	//time for other processes to fininsh
+	time.Sleep(500 * time.Millisecond)
 	sdl.Quit()
 
 }
