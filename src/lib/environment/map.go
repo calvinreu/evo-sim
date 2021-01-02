@@ -60,7 +60,7 @@ func (m *Map) Load(filename string, creatureIDs map[uint32]*Creature) {
 	}
 }
 
-//create a Field from Field save
+//CreateField create a field from field save info object
 func (fieldSave *FieldSave) CreateField(creatureIDs map[uint32]*Creature) Field {
 	var field Field
 	field.Food = fieldSave.Food
