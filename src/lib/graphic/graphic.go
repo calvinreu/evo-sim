@@ -187,7 +187,7 @@ func (graphic *Graphic) AddCreature(creaturePosition CreatureInstance) *Creature
 	return nil
 }
 
-//
+//SetRunningBool setter for thread independent acces to the graphic.running value
 func (graphic *Graphic) SetRunningBool(running *atomic.Value) {
 	graphic.running = running
 }
