@@ -5,7 +5,7 @@
     "FoodGrowthSpeedPerWaterPercent" : 1.4,
     "WaterPerFood" : 1.5,
     "ReproductionCost" : 1.6,
-    "MapHeight" : 1,
+    "MapHeight" : 2,
     "MapWidth" : 2,
     "Seed" : 3,
     "ContinentCount" : 4
