@@ -10,7 +10,7 @@
         }],[ {
             "Food" : 20,
             "WaterPercentage" : 50,
-            "Creatures" : []
+            "Creatures" : [0]
         },{
             "Food" : 40,
             "WaterPercentage" : 100,

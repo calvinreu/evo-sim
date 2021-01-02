@@ -1,0 +1,10 @@
+{
+    "FoodLevel" : 10,
+    "WaterLevel" : 11,
+    "EnergyLevel" : 11.1,
+    "Speed" : 11.11,
+    "WaterSlowdown" : 11.111,
+    "X" : 0.5,
+    "Y" : 0.5,
+    "Brain" : "not existing"
+}
