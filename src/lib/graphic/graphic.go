@@ -54,10 +54,47 @@ type Graphic struct {
 	fps          uint32
 	chartSRect   sdl.Rect
 	chartDRect   sdl.Rect
-	sprites      []Sprite
+	creatures    Sprite
+	sprites      []Sprite // use for multiple stationary textures
 	chartTexture *sdl.Texture
 	renderer     *sdl.Renderer
 	window       *sdl.Window
+	tileW, tileH int32
+}
+
+//Configure graphic for use with info from config file
+func (graphic *Graphic) Configure(config *config.Config, chart *environment.Map) {
+
+	err := graphic.New(config.WinConfig.Title, config.WinConfig.X, config.WinConfig.Y, config.WinConfig.Width, config.WinConfig.Height, config.WinConfig.WindowFlags, config.WinConfig.RendererFlags, config.WinConfig.FPS)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("Window initialized")
+
+	graphic.tileW, graphic.tileH = config.ImgConfig[0].SrcRects[0].W, config.ImgConfig[0].SrcRects[0].H
+	graphic.AddMap(&config.ImgConfig[0], chart)
+
+	var creatureSRect sdl.Rect
+	creatureSRect.X, creatureSRect.Y, creatureSRect.W, creatureSRect.H = config.ImgConfig[1].SrcRects[0].X, config.ImgConfig[1].SrcRects[0].Y, config.ImgConfig[1].SrcRects[0].W, config.ImgConfig[1].SrcRects[0].H
+
+	graphic.creatures, err = NewSprite(graphic.renderer, config.ImgConfig[1].ImgPath, creatureSRect)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("Map Texture initialized")
+
+	for _, i := range config.ImgConfig[2:] {
+		mainSpriteID := graphic.AddSprite(i.ImgPath, i.SrcRects[0])
+		fmt.Println("Initialized sprite via file path: ", i.ImgPath)
+		for _, iSrcRect := range i.SrcRects[1:] {
+			graphic.AddSpriteByID(mainSpriteID, iSrcRect)
+			fmt.Println("Initialized sprite via spriteID: ", mainSpriteID)
+		}
+	}
 }
 
 //AddMap adds the map for rendering to the graphic
@@ -69,7 +106,7 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 		return
 	}
 
-	MapWidth, MapHeight := (int32)(len(chart.Fields))*(tileConfig.SrcRects[0].W), (int32)(len(chart.Fields[0]))*(tileConfig.SrcRects[0].H)
+	MapWidth, MapHeight := (int32)(len(chart.Fields))*(graphic.tileW), (int32)(len(chart.Fields[0]))*(graphic.tileH)
 
 	graphic.chartTexture, err = graphic.renderer.CreateTexture(sdl.PIXELFORMAT_RGB888, sdl.TEXTUREACCESS_TARGET, MapWidth, MapHeight)
 	if err != nil {
@@ -140,6 +177,16 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 	}
 }
 
+//AddCreature instance to the renderer the creature won't be changed
+func (graphic *Graphic) AddCreature(creaturePosition CreatureInstance) *CreatureInstance {
+	if instance, ok := graphic.creatures.instances.PushBack(&creaturePosition).Value.(*CreatureInstance); ok {
+		return instance
+	}
+
+	println("fatal error &instance in func AddCreature is no *CreatureInstance")
+	return nil
+}
+
 //
 func (graphic *Graphic) SetRunningBool(running *atomic.Value) {
 	graphic.running = running
@@ -167,10 +214,23 @@ func (graphic Graphic) RunOutput(done chan bool) {
 //Render renders the information from the graphic object to the screen
 func (graphic *Graphic) Render() {
 
+	var dRect sdl.FRect
+	dRect.W, dRect.H = (float32)(graphic.creatures.srcRect.W), (float32)(graphic.creatures.srcRect.H)
+
 	graphic.renderer.SetDrawColor(10, 10, 10, 1)
 	graphic.renderer.Clear()
 
 	graphic.renderer.Copy(graphic.chartTexture, &graphic.chartSRect, &graphic.chartDRect)
+
+	//render creatures
+	for i := graphic.creatures.instances.Front(); i != nil; i = i.Next() {
+		if instance, ok := i.Value.(*CreatureInstance); ok {
+			dRect.X, dRect.Y = ((*instance).X*(float32)(graphic.tileW))+(float32)(graphic.chartDRect.X), ((*instance).Y*(float32)(graphic.tileH))+(float32)(graphic.chartDRect.Y)
+			graphic.renderer.CopyF(graphic.creatures.texture, &graphic.creatures.srcRect, &dRect)
+		} else {
+			fmt.Println("list of sprite does not contain CreatureInstances")
+		}
+	}
 
 	for _, i := range graphic.sprites {
 		for j := i.instances.Front(); j != nil; j = j.Next() {

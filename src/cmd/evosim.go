@@ -55,6 +55,15 @@ func main() {
 	}
 
 	window.Configure(&config, &chart)
+
+	for i := creatures.Front(); i != nil; i = i.Next() {
+		if creature, ok := i.Value.(*environment.Creature); ok {
+			window.AddCreature(&creature.Position)
+		} else {
+			fmt.Println("list of sprite does not contain creatures")
+		}
+	}
+
 	window.SetRunningBool(&renderSync)
 
 	go window.RunOutput(renderChannel)

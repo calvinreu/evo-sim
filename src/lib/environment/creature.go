@@ -1,12 +1,21 @@
 package environment
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"math"
+
+	"github.com/veandco/go-sdl2/sdl"
 
 	"../config"
 )
 
-type Brain struct {
+//CreatureSave is a struct to convert creature json file
+type CreatureSave struct {
+	FoodLevel, WaterLevel, EnergyLevel, Speed, WaterSlowdown float64
+	X, Y                                                     float32
+	Brain                                                    string //filepath
 }
 
 //Attributes every creature has
@@ -19,13 +28,15 @@ type Creature struct {
 	WaterLevel  float64
 	EnergyLevel float64
 
+	Position sdl.FPoint
+
 	attributes Attributes
 	brain      Brain
 }
 
 //Generates a new Creature
-func NewCreature(attributes Attributes, brain Brain) Creature {
-	return Creature{0, 0, 0, attributes, brain}
+func NewCreature(attributes Attributes, brain Brain, position sdl.FPoint) Creature {
+	return Creature{0, 0, 0, position, attributes, brain}
 }
 
 //Has the creature enough energy to reproduce?
@@ -60,5 +71,23 @@ func (c *Creature) GetAttributes() Attributes {
 
 //Load creature from file
 func (c *Creature) Load(filename string) {
+	var creatureSaveFile CreatureSave
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	err = json.Unmarshal(data, &creatureSaveFile)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
 
+	c.attributes.Speed = creatureSaveFile.Speed
+	c.attributes.WaterSlowdown = creatureSaveFile.WaterSlowdown
+	c.FoodLevel = creatureSaveFile.FoodLevel
+	c.WaterLevel = creatureSaveFile.WaterLevel
+	c.EnergyLevel = creatureSaveFile.EnergyLevel
+	c.Position.X = creatureSaveFile.X
+	c.Position.Y = creatureSaveFile.Y
+
+	c.brain.Load(creatureSaveFile.Brain)
 }

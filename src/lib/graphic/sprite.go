@@ -15,6 +15,9 @@ type Instance struct {
 	Center   sdl.FPoint
 }
 
+//CreatureInstance is type used by renderer for every instance of a creature
+type CreatureInstance *sdl.FPoint
+
 //Sprite contains the texture a list of instances and a srcRect
 type Sprite struct {
 	texture   *sdl.Texture
