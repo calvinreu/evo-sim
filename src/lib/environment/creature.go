@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"container/list"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -28,15 +29,16 @@ type Creature struct {
 	WaterLevel  float64
 	EnergyLevel float64
 
-	Position sdl.FPoint
+	Position        sdl.FPoint
+	GraphicInstance *list.Element
 
 	attributes Attributes
 	brain      Brain
 }
 
 //Generates a new Creature
-func NewCreature(attributes Attributes, brain Brain, position sdl.FPoint) Creature {
-	return Creature{0, 0, 0, position, attributes, brain}
+func NewCreature(attributes Attributes, brain Brain, position sdl.FPoint, graphicInstance *list.Element) Creature {
+	return Creature{0, 0, 0, position, graphicInstance, attributes, brain}
 }
 
 //Has the creature enough energy to reproduce?
@@ -62,6 +64,11 @@ func (c *Creature) ProduceEnergy(config *config.EnvironmentConfig) float64 {
 	c.WaterLevel -= producedEnergy * config.WaterPerFood
 
 	return producedEnergy
+}
+
+//Die removes the creature from the map usw but doen't remove the graphics instance
+func (c *Creature) Die() {
+	c.brain.Delete()
 }
 
 //Getter for attributes

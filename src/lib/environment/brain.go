@@ -8,3 +8,8 @@ type Brain struct {
 func (brain *Brain) Load(filename string) {
 
 }
+
+//Delete Deletes all the data of the brain
+func (brain *Brain) Delete() {
+
+}

@@ -40,6 +40,7 @@
 package graphic
 
 import (
+	"container/list"
 	"fmt"
 	"sync/atomic"
 
@@ -178,13 +179,21 @@ func (graphic *Graphic) AddMap(tileConfig *config.ImageConfig, chart *environmen
 }
 
 //AddCreature instance to the renderer the creature won't be changed
-func (graphic *Graphic) AddCreature(creaturePosition CreatureInstance) *CreatureInstance {
-	if instance, ok := graphic.creatures.instances.PushBack(&creaturePosition).Value.(*CreatureInstance); ok {
-		return instance
+func (graphic *Graphic) AddCreature(creaturePosition CreatureInstance) *list.Element {
+	e := graphic.creatures.instances.PushBack(&creaturePosition)
+	if _, ok := e.Value.(*CreatureInstance); ok {
+		return e
 	}
-
 	println("fatal error &instance in func AddCreature is no *CreatureInstance")
 	return nil
+
+}
+
+//RemoveCreature Removes a graphics instance of a creature with the pointer creature
+func (graphic *Graphic) RemoveCreature(creature *environment.Creature) {
+	if _, ok := graphic.creatures.instances.Remove(creature.GraphicInstance).(*CreatureInstance); !ok {
+		println("fatal error creature.GraphicInstance *list.Element in func RemoveCreature does not contain type CreatureInstance")
+	}
 }
 
 //SetRunningBool setter for thread independent acces to the graphic.running value
